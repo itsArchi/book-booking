@@ -46,28 +46,40 @@ const BorrowedBooksPage = () => {
   };
 
   return (
-    <div className="p-6">
-      <h1 className="text-3xl font-semibold text-center mb-6">Borrowed Books</h1>
-      {errorMessage && <div className="text-red-500 text-center mb-4">{errorMessage}</div>}
+    <div className="p-6 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 min-h-screen flex items-center justify-center">
+      <div className="max-w-6xl w-full space-y-6">
+        <h1 className="text-4xl font-extrabold text-center text-white tracking-tight">
+          Borrowed Books
+        </h1>
 
-      {borrowedBooks.length === 0 ? (
-        <div className="text-center text-gray-600">You havent borrowed any books.</div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {borrowedBooks.map((book) => (
-            <div key={book.code} className="bg-white p-4 rounded-lg shadow-lg">
-              <h3 className="font-semibold text-xl">{book.title}</h3>
-              <p>{book.author}</p>
-              <button
-                onClick={() => handleReturnBook(book.code)}
-                className="mt-4 bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600 transition duration-300"
+        {errorMessage && <div className="text-red-400 text-center mb-4">{errorMessage}</div>}
+
+        {borrowedBooks.length === 0 ? (
+          <div className="text-center text-white text-lg">
+            You havent borrowed any books yet.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-8">
+            {borrowedBooks.map((book) => (
+              <div
+                key={book.code}
+                className="bg-white p-6 rounded-lg shadow-xl transform hover:scale-105 transition duration-300 ease-in-out"
               >
-                Return Book
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
+                <h3 className="font-semibold text-2xl text-gray-800">{book.title}</h3>
+                <p className="text-gray-600 mt-2">{book.author}</p>
+                <div className="mt-4">
+                  <button
+                    onClick={() => handleReturnBook(book.code)}
+                    className="w-full py-2 px-4 bg-red-500 text-white rounded-md hover:bg-red-600 transition duration-300"
+                  >
+                    Return Book
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

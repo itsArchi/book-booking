@@ -1,32 +1,30 @@
-import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { NextRequest, NextResponse } from 'next/server';
+import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
 // GET MEMBER BY CODE
 export async function GET(req: NextRequest) {
-  const code = req.nextUrl.searchParams.get("code");  // Get code from the query parameters
-
+  const code = req.nextUrl.searchParams.get('code'); // Use nextUrl.searchParams to get query params
+  
+  if (!code) {
+    return NextResponse.json({ message: 'Member code is required' }, { status: 400 });
+  }
+  
   try {
-    if (code) {
-      // If the code is provided, fetch the member with that code
-      const member = await prisma.member.findUnique({
-        where: { code },
-      });
+    const member = await prisma.member.findUnique({
+      where: { code },
+      select: { name: true }, // Only return the name
+    });
 
-      if (!member) {
-        return NextResponse.json({ message: "Member not found" }, { status: 404 });
-      }
-
-      return NextResponse.json(member); // Return the member with the provided code
-    } else {
-      // If no code is provided, fetch all members
-      const members = await prisma.member.findMany();
-      return NextResponse.json(members);  // Return all members
+    if (!member) {
+      return NextResponse.json({ message: 'Member not found' }, { status: 404 });
     }
-  } catch (error: unknown) {
-    console.error(error);
-    return NextResponse.json({ message: "Error fetching members" }, { status: 500 });
+
+    return NextResponse.json(member);  // Ensure this is returning the correct object
+  } catch (error) {
+    console.error('Error fetching member:', error);
+    return NextResponse.json({ message: 'Error fetching member' }, { status: 500 });
   }
 }
 
@@ -39,19 +37,19 @@ export async function POST(req: NextRequest) {
       data: { code, name },
     });
     return NextResponse.json(newMember);
-  } catch (error: unknown) {
-    console.error(error);
-    return NextResponse.json({ message: "Error creating member" }, { status: 500 });
+  } catch (error) {
+    console.error('Error creating member:', error);
+    return NextResponse.json({ message: 'Error creating member' }, { status: 500 });
   }
 }
 
 // UPDATE MEMBER
 export async function PUT(req: NextRequest) {
-  const code = req.nextUrl.searchParams.get("code"); // Get code from query params
+  const code = req.nextUrl.searchParams.get('code'); // Get code from query params
   const { name } = await req.json(); // Assuming only name is being updated
 
   if (!code || !name) {
-    return NextResponse.json({ message: "Code and name are required" }, { status: 400 });
+    return NextResponse.json({ message: 'Code and name are required' }, { status: 400 });
   }
 
   try {
@@ -61,18 +59,18 @@ export async function PUT(req: NextRequest) {
     });
 
     return NextResponse.json(updatedMember); // Return the updated member
-  } catch (error: unknown) {
-    console.error(error);
-    return NextResponse.json({ message: "Error updating member" }, { status: 500 });
+  } catch (error) {
+    console.error('Error updating member:', error);
+    return NextResponse.json({ message: 'Error updating member' }, { status: 500 });
   }
 }
 
 // DELETE MEMBER
 export async function DELETE(req: NextRequest) {
-  const code = req.nextUrl.searchParams.get("code");
+  const code = req.nextUrl.searchParams.get('code');
 
   if (!code) {
-    return NextResponse.json({ message: "Code is required" }, { status: 400 });
+    return NextResponse.json({ message: 'Code is required' }, { status: 400 });
   }
 
   try {
@@ -80,10 +78,10 @@ export async function DELETE(req: NextRequest) {
       where: { code },
     });
 
-    return NextResponse.json({ message: "Member deleted successfully" });
-  } catch (error: unknown) {
-    console.error(error);
-    return NextResponse.json({ message: "Error deleting member" }, { status: 500 });
+    return NextResponse.json({ message: 'Member deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting member:', error);
+    return NextResponse.json({ message: 'Error deleting member' }, { status: 500 });
   }
 }
 
@@ -92,7 +90,7 @@ export async function PUT_BORROW(req: NextRequest) {
   const { memberCode, bookCode } = await req.json();
 
   if (!memberCode || !bookCode) {
-    return NextResponse.json({ message: "Both memberCode and bookCode are required" }, { status: 400 });
+    return NextResponse.json({ message: 'Both memberCode and bookCode are required' }, { status: 400 });
   }
 
   try {
@@ -111,14 +109,14 @@ export async function PUT_BORROW(req: NextRequest) {
     if (!book) throw new Error('Book not found');
     if (book.isBorrowed) throw new Error('Book is already borrowed');
 
-    // Mark book as borrowed and update the stock
     await prisma.book.update({
       where: { code: bookCode },
       data: { isBorrowed: true, memberId: member.id, stock: book.stock - 1 },
     });
 
-    return NextResponse.json({ message: "Book borrowed successfully" });
-  } catch (error: unknown) {
+    return NextResponse.json({ message: 'Book borrowed successfully' });
+  } catch (error) {
+    console.error('Error borrowing book:', error);
     return NextResponse.json({ message: error instanceof Error ? error.message : 'Error borrowing book' }, { status: 500 });
   }
 }
@@ -144,15 +142,14 @@ export async function PUT_RETURN(req: NextRequest) {
       return NextResponse.json({ message: 'This book is not currently borrowed' }, { status: 400 });
     }
 
-    // Update book stock and mark it as available
     await prisma.book.update({
       where: { code: bookCode },
       data: { isBorrowed: false, memberId: null, stock: book.stock + 1 },
     });
 
     return NextResponse.json({ message: 'Book returned successfully' });
-  } catch (error: unknown) {
-    console.error(error);
+  } catch (error) {
+    console.error('Error returning the book:', error);
     return NextResponse.json({ message: 'Error returning the book' }, { status: 500 });
   }
 }

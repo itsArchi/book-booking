@@ -23,7 +23,6 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ message: "This book is not currently borrowed" }, { status: 400 });
     }
 
-    // Update book status to 'available' and increase stock by 1
     await prisma.book.update({
       where: { code: bookCode },
       data: { isBorrowed: false, memberId: null, stock: book.stock + 1 },

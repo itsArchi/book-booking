@@ -1,7 +1,11 @@
+import '@testing-library/jest-dom';
+
 module.exports = {
-    testEnvironment: 'jsdom',
-    transform: {
-      '^.+\\.(ts|tsx)$': 'ts-jest',
-    },
-  };
-  
+  testEnvironment: 'node',
+  transform: {
+    '^.+\\.tsx?$': 'ts-jest',
+  },
+  moduleNameMapper: {
+    '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
+  },
+};

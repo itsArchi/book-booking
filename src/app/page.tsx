@@ -1,64 +1,35 @@
 'use client'
 
-import React, { useEffect, useState } from 'react';
-import axios from '../utils/axios';  // Axios instance for API calls
-
-interface Book {
-  code: string;
-  title: string;
-  author: string;
-  stock: number;
-  isBorrowed: boolean;
-}
+import React from 'react';
+import { useRouter } from 'next/navigation';
 
 const HomePage = () => {
-  const [books, setBooks] = useState<Book[]>([]);
+  const router = useRouter();
 
-  useEffect(() => {
-    const fetchBooks = async () => {
-      try {
-        const response = await axios.get('/book');
-        setBooks(response.data);
-      } catch (error) {
-        console.error('Error fetching books:', error);
-      }
-    };
-    fetchBooks();
-  }, []);
-
-  const handleBorrowBook = async (bookCode: string) => {
-    // Handle borrowing book logic (example)
-    try {
-      await axios.put(`/member/borrow`, { bookCode });
-      setBooks((prevBooks) =>
-        prevBooks.map((book) =>
-          book.code === bookCode ? { ...book, isBorrowed: true } : book
-        )
-      );
-    } catch (error) {
-      console.error('Error borrowing book:', error);
-    }
+  const handleLogout = () => {
+    localStorage.removeItem('memberCode');
+    router.push('/login');
   };
 
   return (
-    <div className="p-4 space-y-4">
-      <h1 className="text-2xl font-semibold">Available Books Root</h1>
-      <div className="grid grid-cols-3 gap-4">
-        {books.map((book) => (
-          <div key={book.code} className="border p-4 rounded shadow">
-            <h3 className="font-semibold">{book.title}</h3>
-            <p>{book.author}</p>
-            <p>Stock: {book.stock}</p>
-            <p>{book.isBorrowed ? 'Not Available' : 'Available'}</p>
-            <button
-              onClick={() => handleBorrowBook(book.code)}
-              disabled={book.isBorrowed}
-              className="bg-blue-500 text-white p-2 mt-2 w-full"
-            >
-              {book.isBorrowed ? 'Already Borrowed' : 'Borrow'}
-            </button>
-          </div>
-        ))}
+    <div className="flex justify-center items-center min-h-screen bg-gradient-to-r from-green-400 to-blue-500">
+      <div className="bg-white p-8 rounded-lg shadow-lg w-full sm:w-96 text-center">
+        <h1 className="text-3xl font-semibold text-gray-800 mb-6">Welcome to the Booking App</h1>
+        <p className="text-lg mb-4">Here you can borrow and return books</p>
+
+        <button
+          onClick={() => router.push('/book')} 
+          className="bg-blue-500 text-white p-3 rounded-md hover:bg-blue-600 transition duration-300 w-full mb-4"
+        >
+          Go to Book List
+        </button>
+
+        <button
+          onClick={handleLogout} 
+          className="bg-red-500 text-white p-3 rounded-md hover:bg-red-600 transition duration-300 w-full"
+        >
+          Logout
+        </button>
       </div>
     </div>
   );

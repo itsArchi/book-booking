@@ -12,7 +12,7 @@ export const borrowBook = async (bookCode: string, memberCode: string) => {
   const book = await prisma.book.findUnique({ where: { code: bookCode } });
   const member = await prisma.member.findUnique({
     where: { code: memberCode },
-    include: { books: true },  // Include the books relation
+    include: { books: true },  
   });
 
   if (!book || !member) throw new Error('Book or Member not found');
@@ -29,7 +29,7 @@ export const returnBook = async (bookCode: string, memberCode: string, daysLate:
   const book = await prisma.book.findUnique({ where: { code: bookCode } });
   const member = await prisma.member.findUnique({
     where: { code: memberCode },
-    include: { books: true },  // Include the books relation
+    include: { books: true },  
   });
 
   if (!book || !member) throw new Error('Book or Member not found');
@@ -42,7 +42,7 @@ export const returnBook = async (bookCode: string, memberCode: string, daysLate:
       where: { code: memberCode },
       data: { penalties: { increment: 1 } },
     });
-    console.log(`Penalty applied: ${penalty}`); // Log penalty if needed
+    console.log(`Penalty applied: ${penalty}`);
   }
 
   return await prisma.book.update({

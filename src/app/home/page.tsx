@@ -6,8 +6,13 @@ import { useRouter } from 'next/navigation';
 const HomePage = () => {
   const router = useRouter();
 
+  const isLoggedIn = localStorage.getItem('memberCode') !== null;
+
+  const handleLogin = () => {
+    router.push('/login');
+  };
+
   const handleLogout = () => {
-    // Clear the stored member code and redirect to login page
     localStorage.removeItem('memberCode');
     router.push('/login');
   };
@@ -18,21 +23,28 @@ const HomePage = () => {
         <h1 className="text-3xl font-semibold text-gray-800 mb-6">Welcome to the Booking App</h1>
         <p className="text-lg mb-4">Here you can borrow and return books</p>
 
-        {/* Button to go to the book list */}
         <button
-          onClick={() => router.push('/book')} // Navigate to the book borrowing page
+          onClick={() => router.push('/book')} 
           className="bg-blue-500 text-white p-3 rounded-md hover:bg-blue-600 transition duration-300 w-full mb-4"
         >
           Go to Book List
         </button>
 
-        {/* Logout button */}
-        <button
-          onClick={handleLogout} // Logout and redirect to the login page
-          className="bg-red-500 text-white p-3 rounded-md hover:bg-red-600 transition duration-300 w-full"
-        >
-          Logout
-        </button>
+        {isLoggedIn ? (
+          <button
+            onClick={handleLogout} 
+            className="bg-red-500 text-white p-3 rounded-md hover:bg-red-600 transition duration-300 w-full"
+          >
+            Logout
+          </button>
+        ) : (
+          <button
+            onClick={handleLogin} 
+            className="bg-green-500 text-white p-3 rounded-md hover:bg-green-600 transition duration-300 w-full"
+          >
+            Login
+          </button>
+        )}
       </div>
     </div>
   );

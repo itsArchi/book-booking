@@ -1,10 +1,60 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/**
+ * @swagger
+ * /api/member:
+ *   get:
+ *     summary: Get member by code
+ *     description: Fetches a member using their member code
+ *     parameters:
+ *       - in: query
+ *         name: code
+ *         required: true
+ *         description: The unique code for the member
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Member found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: string
+ *                   example: "12345"
+ *                 name:
+ *                   type: string
+ *                   example: "John Doe"
+ *       400:
+ *         description: Invalid input
+ *       404:
+ *         description: Member not found
+ */
+
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
-import dayjs from "dayjs"; // Ensure this is installed by running `npm install dayjs`
+import dayjs from "dayjs"; 
+import { swaggerSetup } from '../../../../utils/swagger';
 
 const prisma = new PrismaClient();
 
-// BORROW BOOK
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
+const handler = (req: NextRequest, res: NextResponse) => {
+  if (req.method === 'GET') {
+    return swaggerSetup(req, res);
+  }
+
+  res.status(200).json({ message: 'Normal API response' });
+};
+
+export default handler;
+
 // BORROW BOOK
 export async function PUT(req: NextRequest) {
   const { memberCode, bookCode } = await req.json();
@@ -14,7 +64,6 @@ export async function PUT(req: NextRequest) {
   }
 
   try {
-    // Check member's borrowing status
     const member = await prisma.member.findUnique({
       where: { code: memberCode },
       include: { books: true },
@@ -26,7 +75,6 @@ export async function PUT(req: NextRequest) {
       throw new Error('Member is currently under penalty');
     }
 
-    // Check if the book is already borrowed
     const book = await prisma.book.findUnique({
       where: { code: bookCode },
     });
@@ -37,7 +85,7 @@ export async function PUT(req: NextRequest) {
     // Borrow the book
     await prisma.book.update({
       where: { code: bookCode },
-      data: { isBorrowed: true, memberId: member.id, stock: book.stock - 1, borrowedAt: new Date() },
+      data: { isBorrowed: true, memberId: member.id, stock: book.stock - 1 },
     });
 
     return NextResponse.json({ message: "Book borrowed successfully" });
@@ -45,7 +93,6 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ message: error instanceof Error ? error.message : 'Error borrowing book' }, { status: 500 });
   }
 }
-
 
 // RETURN BOOK
 export async function PUT_RETURN(req: NextRequest) {
@@ -56,7 +103,6 @@ export async function PUT_RETURN(req: NextRequest) {
   }
 
   try {
-    // Get the book and member details
     const book = await prisma.book.findUnique({
       where: { code: bookCode },
     });
@@ -69,7 +115,6 @@ export async function PUT_RETURN(req: NextRequest) {
       return NextResponse.json({ message: 'This book is not currently borrowed' }, { status: 400 });
     }
 
-    // Get the member who borrowed the book
     const member = await prisma.member.findUnique({
       where: { id: book.memberId },
     });
@@ -78,7 +123,6 @@ export async function PUT_RETURN(req: NextRequest) {
       return NextResponse.json({ message: 'Member not found' }, { status: 404 });
     }
 
-    // Check if the book was returned after 7 days (penalty logic)
     const borrowedDate = book.borrowedAt ? dayjs(book.borrowedAt) : dayjs();
     const returnDate = dayjs();
     const diffDays = returnDate.diff(borrowedDate, 'day');
@@ -89,15 +133,10 @@ export async function PUT_RETURN(req: NextRequest) {
       penaltyMessage = 'You have incurred a penalty for returning the book late';
       await prisma.member.update({
         where: { id: member.id },
-        data: {
-          penaltyUntil: {
-            set: returnDate.add(3, 'days').toDate()
-          }
-        },
-      })
+        data: { penaltyUntil: returnDate.add(3, 'days').toDate() }, 
+      });
     }
 
-    // Mark the book as returned and update the stock
     await prisma.book.update({
       where: { code: bookCode },
       data: { isBorrowed: false, memberId: null, stock: book.stock + 1 },
@@ -110,12 +149,12 @@ export async function PUT_RETURN(req: NextRequest) {
   }
 }
 
-// GET ALL BOOKS (show only available books)
+// GET ALL BOOKS 
 export async function GET(req: NextRequest) {
   try {
     const books = await prisma.book.findMany({
       where: {
-        isBorrowed: false, // Only show available books
+        isBorrowed: false,
       },
     });
     return NextResponse.json(books);
@@ -125,12 +164,12 @@ export async function GET(req: NextRequest) {
   }
 }
 
-// GET MEMBER BY CODE (show all members)
+// GET MEMBER BY CODE 
 export async function GET_MEMBER(req: NextRequest) {
   try {
     const members = await prisma.member.findMany({
       include: {
-        books: true,  // Include borrowed books
+        books: true,  
       },
     });
 

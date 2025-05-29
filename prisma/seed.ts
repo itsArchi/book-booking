@@ -1,10 +1,8 @@
-// src/prisma/seed.ts
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
 const main = async () => {
-  // Seed Books
   const books = [
     {
       code: "JK-45",
@@ -38,14 +36,12 @@ const main = async () => {
     },
   ];
 
-  // Seed Members
   const members = [
     { code: "M001", name: "Angga" },
     { code: "M002", name: "Ferry" },
     { code: "M003", name: "Putri" },
   ];
 
-  // Insert mock data into the database
   for (const book of books) {
     await prisma.book.create({ data: book });
   }

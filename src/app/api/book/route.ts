@@ -56,9 +56,8 @@ export async function POST(req: NextRequest) {
 // UPDATE BOOK STOCK
 export async function PUT(req: NextRequest) {
   const { title, author, stock } = await req.json();
-  const code = req.nextUrl.searchParams.get('code');  // Correctly extracting 'code' from query params
+  const code = req.nextUrl.searchParams.get('code');  
 
-  // Validation: Ensure code and required fields are provided
   if (!code) {
     return NextResponse.json({ message: "Code parameter is required" }, { status: 400 });
   }
@@ -90,7 +89,7 @@ export async function PUT(req: NextRequest) {
 
 // DELETE BOOK
 export async function DELETE(req: NextRequest) {
-  const code = req.nextUrl.searchParams.get("code");  // Ensure we extract 'code' from query params
+  const code = req.nextUrl.searchParams.get("code"); 
 
   if (!code) {
     return NextResponse.json({ message: "Code parameter is required" }, { status: 400 });
