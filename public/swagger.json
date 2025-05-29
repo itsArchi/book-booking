@@ -1,0 +1,57 @@
+{
+    "swagger": "2.0",
+    "info": {
+      "description": "Library System API",
+      "version": "1.0.0",
+      "title": "Library System API"
+    },
+    "paths": {
+      "/api/book": {
+        "get": {
+          "summary": "Get all books",
+          "responses": {
+            "200": {
+              "description": "A list of books",
+              "schema": {
+                "type": "array",
+                "items": { "$ref": "#/definitions/Book" }
+              }
+            }
+          }
+        }
+      },
+      "/api/member": {
+        "get": {
+          "summary": "Get all members",
+          "responses": {
+            "200": {
+              "description": "A list of members",
+              "schema": {
+                "type": "array",
+                "items": { "$ref": "#/definitions/Member" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "definitions": {
+      "Book": {
+        "type": "object",
+        "properties": {
+          "code": { "type": "string" },
+          "title": { "type": "string" },
+          "author": { "type": "string" },
+          "stock": { "type": "integer" }
+        }
+      },
+      "Member": {
+        "type": "object",
+        "properties": {
+          "code": { "type": "string" },
+          "name": { "type": "string" }
+        }
+      }
+    }
+  }
+  

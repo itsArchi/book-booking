@@ -1,0 +1,29 @@
+datasource db {
+  provider = "mysql"        
+  url      = env("DATABASE_URL") 
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Member {
+  id          Int      @id @default(autoincrement())
+  code        String   @unique
+  name        String
+  penalties   Int      @default(0)
+  penaltyUntil DateTime? @db.DateTime
+  books       Book[]
+}
+
+model Book {
+  code       String   @id
+  title      String
+  author     String
+  stock      Int
+  isBorrowed Boolean
+  borrowedAt DateTime? @db.DateTime 
+  memberId   Int?
+  member     Member?  @relation(fields: [memberId], references: [id])
+}
+
