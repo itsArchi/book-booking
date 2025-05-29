@@ -5,6 +5,7 @@ import dayjs from "dayjs"; // Ensure this is installed by running `npm install d
 const prisma = new PrismaClient();
 
 // BORROW BOOK
+// BORROW BOOK
 export async function PUT(req: NextRequest) {
   const { memberCode, bookCode } = await req.json();
 
@@ -36,7 +37,7 @@ export async function PUT(req: NextRequest) {
     // Borrow the book
     await prisma.book.update({
       where: { code: bookCode },
-      data: { isBorrowed: true, memberId: member.id, stock: book.stock - 1, borrowedAt: new Date() }, // Store the borrowed date
+      data: { isBorrowed: true, memberId: member.id, stock: book.stock - 1, borrowedAt: new Date() },
     });
 
     return NextResponse.json({ message: "Book borrowed successfully" });
@@ -44,6 +45,7 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ message: error instanceof Error ? error.message : 'Error borrowing book' }, { status: 500 });
   }
 }
+
 
 // RETURN BOOK
 export async function PUT_RETURN(req: NextRequest) {

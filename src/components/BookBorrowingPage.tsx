@@ -19,7 +19,7 @@ const BookBorrowingPage = () => {
   useEffect(() => {
     const fetchBooks = async () => {
       try {
-        const response = await axios.get('/api/book');  // Get only available books
+        const response = await axios.get('/book');  // Get only available books
         setBooks(response.data);
       } catch (error) {
         console.error('Error fetching books:', error);
@@ -31,34 +31,30 @@ const BookBorrowingPage = () => {
 
   const handleBorrowBook = async (bookCode: string) => {
     try {
-      const memberCode = localStorage.getItem('memberCode');
+      const memberCode = localStorage.getItem("memberCode");
       if (!memberCode) {
         setErrorMessage('Please log in first');
         return;
       }
-
-      // Check if member is eligible to borrow the book
-      const response = await axios.put(`/api/member/borrow`, { memberCode, bookCode });
+  
+      const response = await axios.put(`/member/borrow`, { memberCode, bookCode });
       
       if (response.status === 200) {
-        setBooks(prevBooks =>
-          prevBooks.map(book =>
-            book.code === bookCode
-              ? { ...book, isBorrowed: true, stock: book.stock - 1 }
-              : book
+        setBooks((prevBooks) =>
+          prevBooks.map((book) =>
+            book.code === bookCode ? { ...book, isBorrowed: true, stock: book.stock - 1 } : book
           )
         );
-      } else {
-        setErrorMessage(response.data.message);  // Show error message from the backend
       }
     } catch (error) {
       setErrorMessage('Error borrowing book');
+      console.error('Error borrowing book:', error);  // Log the error for debugging
     }
   };
 
   const handleReturnBook = async (bookCode: string) => {
     try {
-      const response = await axios.put(`/api/member/return`, { bookCode });
+      const response = await axios.put(`/member/return`, { bookCode });
       
       if (response.status === 200) {
         setBooks(prevBooks =>
