@@ -1,3 +1,114 @@
+/**
+ * @swagger
+ *   get:
+ *     summary: Get member by code
+ *     description: Fetches a member by their unique code.
+ *     parameters:
+ *       - in: query
+ *         name: code
+ *         required: true
+ *         description: The unique code for the member.
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Member found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: string
+ *                   example: "12345"
+ *                 name:
+ *                   type: string
+ *                   example: "John Doe"
+ *       400:
+ *         description: Code parameter is required
+ *       404:
+ *         description: Member not found
+ *       500:
+ *         description: Internal server error
+ */
+/**
+ * @swagger
+ *   post:
+ *     summary: Create a new member
+ *     description: Creates a new member by providing a code and name.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               code:
+ *                 type: string
+ *               name:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Member created successfully
+ *       400:
+ *         description: Missing required fields
+ *       500:
+ *         description: Internal server error
+ */
+/**
+ * @swagger
+ *   put:
+ *     summary: Update member information
+ *     description: Updates a member's name by providing their code and new name.
+ *     parameters:
+ *       - in: query
+ *         name: code
+ *         required: true
+ *         description: The unique code of the member.
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Member updated successfully
+ *       400:
+ *         description: Code and name are required
+ *       404:
+ *         description: Member not found
+ *       500:
+ *         description: Internal server error
+ */
+/**
+ * @swagger
+ *   delete:
+ *     summary: Delete a member
+ *     description: Deletes a member by their unique code.
+ *     parameters:
+ *       - in: query
+ *         name: code
+ *         required: true
+ *         description: The unique code for the member.
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Member deleted successfully
+ *       400:
+ *         description: Code is required
+ *       404:
+ *         description: Member not found
+ *       500:
+ *         description: Internal server error
+ */
+
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 
@@ -5,7 +116,7 @@ const prisma = new PrismaClient();
 
 // GET MEMBER BY CODE
 export async function GET(req: NextRequest) {
-  const code = req.nextUrl.searchParams.get('code'); // Use nextUrl.searchParams to get query params
+  const code = req.nextUrl.searchParams.get('code'); 
   
   if (!code) {
     return NextResponse.json({ message: 'Member code is required' }, { status: 400 });
@@ -14,14 +125,14 @@ export async function GET(req: NextRequest) {
   try {
     const member = await prisma.member.findUnique({
       where: { code },
-      select: { name: true }, // Only return the name
+      select: { name: true }, 
     });
 
     if (!member) {
       return NextResponse.json({ message: 'Member not found' }, { status: 404 });
     }
 
-    return NextResponse.json(member);  // Ensure this is returning the correct object
+    return NextResponse.json(member); 
   } catch (error) {
     console.error('Error fetching member:', error);
     return NextResponse.json({ message: 'Error fetching member' }, { status: 500 });
@@ -45,8 +156,8 @@ export async function POST(req: NextRequest) {
 
 // UPDATE MEMBER
 export async function PUT(req: NextRequest) {
-  const code = req.nextUrl.searchParams.get('code'); // Get code from query params
-  const { name } = await req.json(); // Assuming only name is being updated
+  const code = req.nextUrl.searchParams.get('code'); 
+  const { name } = await req.json(); 
 
   if (!code || !name) {
     return NextResponse.json({ message: 'Code and name are required' }, { status: 400 });
@@ -58,7 +169,7 @@ export async function PUT(req: NextRequest) {
       data: { name },
     });
 
-    return NextResponse.json(updatedMember); // Return the updated member
+    return NextResponse.json(updatedMember); 
   } catch (error) {
     console.error('Error updating member:', error);
     return NextResponse.json({ message: 'Error updating member' }, { status: 500 });

@@ -1,3 +1,28 @@
+/**
+ * @swagger
+ *   put:
+ *     summary: Return a borrowed book
+ *     description: Allows a member to return a borrowed book.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               bookCode:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Book returned successfully
+ *       400:
+ *         description: Book code is required
+ *       404:
+ *         description: Book not found
+ *       500:
+ *         description: Internal server error
+ */
+
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 

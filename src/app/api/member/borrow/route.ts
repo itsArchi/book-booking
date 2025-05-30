@@ -1,35 +1,29 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * @swagger
- * /api/member:
- *   get:
- *     summary: Get member by code
- *     description: Fetches a member using their member code
- *     parameters:
- *       - in: query
- *         name: code
- *         required: true
- *         description: The unique code for the member
- *         schema:
- *           type: string
+ *   put:
+ *     summary: Borrow a book
+ *     description: Allows a member to borrow a book, given the member's code and the book's code.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               memberCode:
+ *                 type: string
+ *               bookCode:
+ *                 type: string
  *     responses:
  *       200:
- *         description: Member found
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 code:
- *                   type: string
- *                   example: "12345"
- *                 name:
- *                   type: string
- *                   example: "John Doe"
+ *         description: Book borrowed successfully
  *       400:
- *         description: Invalid input
+ *         description: Both memberCode and bookCode are required
  *       404:
- *         description: Member not found
+ *         description: Member or Book not found
+ *       500:
+ *         description: Internal server error
  */
 
 import { NextRequest, NextResponse } from "next/server";

@@ -1,3 +1,113 @@
+/**
+ * @swagger
+ *   get:
+ *     summary: Get all books or book by code
+ *     description: Fetch all books or search for a book using its code.
+ *     parameters:
+ *       - in: query
+ *         name: code
+ *         required: false
+ *         description: The unique code of the book (optional).
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: List of books or a single book by code
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: string
+ *                 title:
+ *                   type: string
+ *                 author:
+ *                   type: string
+ *                 stock:
+ *                   type: integer
+ *       404:
+ *         description: Book not found
+ *       500:
+ *         description: Internal server error
+ *   post:
+ *     summary: Create a new book
+ *     description: Create a new book by providing code, title, author, and stock.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               code:
+ *                 type: string
+ *               title:
+ *                 type: string
+ *               author:
+ *                 type: string
+ *               stock:
+ *                 type: integer
+ *     responses:
+ *       201:
+ *         description: Book created successfully
+ *       400:
+ *         description: Missing required fields
+ *       500:
+ *         description: Internal server error
+ *   put:
+ *     summary: Update book stock and details
+ *     description: Update the details of a book, such as title, author, and stock.
+ *     parameters:
+ *       - in: query
+ *         name: code
+ *         required: true
+ *         description: The unique code of the book
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *               author:
+ *                 type: string
+ *               stock:
+ *                 type: integer
+ *     responses:
+ *       200:
+ *         description: Book updated successfully
+ *       400:
+ *         description: Missing required fields or code
+ *       404:
+ *         description: Book not found
+ *       500:
+ *         description: Internal server error
+ *   delete:
+ *     summary: Delete a book
+ *     description: Deletes a book by its unique code.
+ *     parameters:
+ *       - in: query
+ *         name: code
+ *         required: true
+ *         description: The unique code of the book
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Book deleted successfully
+ *       400:
+ *         description: Code is required
+ *       404:
+ *         description: Book not found
+ *       500:
+ *         description: Internal server error
+ */
+
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 
