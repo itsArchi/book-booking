@@ -1,24 +1,73 @@
-import { borrowBook } from '../../services/bookServices';
-import axios from 'axios';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { borrowBook } from "../../services/bookServices";
+import axios from "axios";
 
-describe('bookServices', () => {
-  it('should borrow a book', async () => {
-    // Mock the resolved value for axios.put
-    (axios.put as jest.Mock).mockResolvedValue({ status: 200, data: { message: 'Book borrowed successfully' } });
+const mockBooks = [
+  {
+    code: "JK-45",
+    title: "Harry Potter",
+    author: "J.K. Rowling",
+    isBorrowed: false,
+    stock: 1,
+  },
+  {
+    code: "SHR-1",
+    title: "A Study in Scarlet",
+    author: "Arthur Conan Doyle",
+    isBorrowed: false,
+    stock: 1,
+  },
+  {
+    code: "TW-11",
+    title: "Twilight",
+    author: "Stephenie Meyer",
+    isBorrowed: false,
+    stock: 1,
+  },
+];
 
-    const result = await borrowBook('12345', 'book123');
-    expect(result.message).toBe('Book borrowed successfully');
+const mockMembers = [
+  { code: "M001", name: "Angga" },
+  { code: "M002", name: "Ferry" },
+  { code: "M003", name: "Putri" },
+];
+
+describe("bookServices", () => {
+  it("should borrow a book successfully", async () => {
+    (axios.put as jest.Mock).mockResolvedValue({
+      data: { message: "Book borrowed successfully" },
+    });
+
+    const memberCode = "M001";
+    const bookCode = "JK-45";
+
+    const result = await borrowBook(memberCode, bookCode);
+
+    expect(result).toEqual({
+      code: bookCode,
+      title: "Harry Potter",
+      author: "J.K. Rowling",
+      stock: 1,
+      isBorrowed: true,
+      borrowedAt: expect.any(Date),
+      memberId: expect.any(Number),
+    });
   });
 
-  it('should handle error if borrowing a book fails', async () => {
-    // Mock the rejected value for axios.put
-    (axios.put as jest.Mock).mockRejectedValue(new Error('Error borrowing book'));
+  it("should handle error if borrowing a book fails", async () => {
+    (axios.put as jest.Mock).mockRejectedValue(
+      new Error("Error borrowing book")
+    );
 
     try {
-      await borrowBook('12345', 'book123');
+      const memberCode = "M001";
+      const bookCode = "SHR-1";
+
+      await borrowBook(memberCode, bookCode);
     } catch (error: unknown) {
-      const typedError = error as Error; // Type assertion
-      expect(typedError.message).toBe('Error borrowing book');
+      const typedError = error as Error;
+
+      expect(typedError.message).toBe("Error borrowing book");
     }
   });
 });

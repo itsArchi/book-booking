@@ -1,57 +1,83 @@
-import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import BookBorrowingPage from '../../components/BookBorrowingPage';
-import axios from 'axios';
-jest.mock('axios'); 
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import React from "react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import BookBorrowingPage from "../../components/BookBorrowingPage";
+import axios from "axios";
+jest.mock("axios");
 
-describe('BookBorrowingPage', () => {
-  it('renders available books', async () => {
+const mockBooks = [
+  {
+    code: "JK-45",
+    title: "Harry Potter",
+    author: "J.K. Rowling",
+    isBorrowed: false,
+    stock: 1,
+  },
+  {
+    code: "SHR-1",
+    title: "A Study in Scarlet",
+    author: "Arthur Conan Doyle",
+    isBorrowed: false,
+    stock: 1,
+  },
+];
+
+const mockMembers = [
+  { code: "M001", name: "Angga" },
+  { code: "M002", name: "Ferry" },
+  { code: "M003", name: "Putri" },
+];
+
+describe("BookBorrowingPage", () => {
+  it("renders available books", async () => {
     (axios.get as jest.Mock).mockResolvedValue({
-      data: [
-        { code: 'book123', title: 'Book 1', author: 'Author 1', isBorrowed: false, stock: 5 },
-      ],
+      data: mockBooks,
     });
 
     render(<BookBorrowingPage />);
 
     await waitFor(() => {
-      expect(screen.getByText('Book 1')).toBeInTheDocument();
+      expect(screen.getByText("Harry Potter")).toBeInTheDocument();
     });
   });
 
-  it('calls the borrow API when borrowing a book', async () => {
+  it("calls the borrow API when borrowing a book", async () => {
     (axios.get as jest.Mock).mockResolvedValue({
-      data: [
-        { code: 'book123', title: 'Book 1', author: 'Author 1', isBorrowed: false, stock: 5 },
-      ],
+      data: mockBooks,
     });
-    (axios.put as jest.Mock).mockResolvedValue({ status: 200 });
+    (axios.put as jest.Mock).mockResolvedValue({
+      status: 200,
+      data: { message: "Book borrowed successfully" },
+    });
 
     render(<BookBorrowingPage />);
 
-    const borrowButton = screen.getByText('Borrow');
+    const borrowButton = screen.getByText("Borrow");
     fireEvent.click(borrowButton);
 
     await waitFor(() => {
-      expect(axios.put).toHaveBeenCalledWith('/member/borrow', { memberCode: '12345', bookCode: 'book123' });
+      expect(axios.put).toHaveBeenCalledWith("/member/borrow", {
+        memberCode: "M001",
+        bookCode: "JK-45",
+      });
     });
   });
 
-  it('shows error message if borrowing fails', async () => {
+  it("shows error message if borrowing fails", async () => {
     (axios.get as jest.Mock).mockResolvedValue({
-      data: [
-        { code: 'book123', title: 'Book 1', author: 'Author 1', isBorrowed: false, stock: 5 },
-      ],
+      data: mockBooks,
     });
-    (axios.put as jest.Mock).mockRejectedValue(new Error('Error borrowing book'));
+    (axios.put as jest.Mock).mockRejectedValue(
+      new Error("Error borrowing book")
+    );
 
     render(<BookBorrowingPage />);
 
-    const borrowButton = screen.getByText('Borrow');
+    const borrowButton = screen.getByText("Borrow");
     fireEvent.click(borrowButton);
 
     await waitFor(() => {
-      expect(screen.getByText('Error borrowing book')).toBeInTheDocument();
+      expect(screen.getByText("Error borrowing book")).toBeInTheDocument();
     });
   });
 });
