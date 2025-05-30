@@ -39,15 +39,6 @@ export const config = {
   },
 };
 
-const handler = (req: NextRequest, res: NextResponse) => {
-  if (req.method === 'GET') {
-    return swaggerSetup(req, res);
-  }
-
-  res.status(200).json({ message: 'Normal API response' });
-};
-
-export default handler;
 
 // BORROW BOOK
 export async function PUT(req: NextRequest) {
@@ -76,7 +67,6 @@ export async function PUT(req: NextRequest) {
     if (!book) throw new Error('Book not found');
     if (book.isBorrowed) throw new Error('Book is already borrowed');
 
-    // Borrow the book
     await prisma.book.update({
       where: { code: bookCode },
       data: { isBorrowed: true, memberId: member.id, stock: book.stock - 1 },
@@ -123,11 +113,10 @@ export async function PUT_RETURN(req: NextRequest) {
 
     let penaltyMessage = '';
     if (diffDays > 7) {
-      // Member is penalized
       penaltyMessage = 'You have incurred a penalty for returning the book late';
       await prisma.member.update({
         where: { id: member.id },
-        data: { penaltyUntil: returnDate.add(3, 'days').toDate() }, 
+        data: { penaltyUntil: returnDate.add(3, 'days').toDate() },
       });
     }
 
@@ -147,30 +136,39 @@ export async function PUT_RETURN(req: NextRequest) {
 export async function GET(req: NextRequest) {
   try {
     const books = await prisma.book.findMany({
-      where: {
-        isBorrowed: false,
-      },
+      where: { isBorrowed: false },
     });
     return NextResponse.json(books);
-  } catch (error: unknown) {
+  } catch (error) {
     console.error(error);
-    return NextResponse.json({ message: "Error fetching books" }, { status: 500 });
+    return NextResponse.json({ message: "Error fetching available books" }, { status: 500 });
   }
 }
 
 // GET MEMBER BY CODE 
 export async function GET_MEMBER(req: NextRequest) {
+  const code = req.nextUrl.searchParams.get("code");
+
+  if (!code) {
+    return NextResponse.json({ message: "Member code is required" }, { status: 400 });
+  }
+
   try {
-    const members = await prisma.member.findMany({
-      include: {
-        books: true,  
-      },
+    const member = await prisma.member.findUnique({
+      where: { code },
+      include: { books: true },
     });
 
-    return NextResponse.json(members);
-  } catch (error: unknown) {
+    if (!member) {
+      return NextResponse.json({ message: "Member not found" }, { status: 404 });
+    }
+
+    const borrowedBooks = member.books.filter((book) => book.isBorrowed);
+
+    return NextResponse.json(borrowedBooks); 
+  } catch (error) {
     console.error(error);
-    return NextResponse.json({ message: "Error fetching members" }, { status: 500 });
+    return NextResponse.json({ message: "Error fetching member or borrowed books" }, { status: 500 });
   }
 }
 

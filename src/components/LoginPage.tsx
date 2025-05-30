@@ -14,11 +14,10 @@ const LoginPage = () => {
       return;
     }
 
-    // Simulate a member code validation (you should check with the backend)
-    if (memberCode === 'M001' || memberCode === 'M002') {
-      localStorage.setItem('memberCode', memberCode);  // Store memberCode in localStorage
+    if (memberCode === 'M001' || memberCode === 'M002' || memberCode === 'M003') {
+      localStorage.setItem('memberCode', memberCode);  
       setErrorMessage('');
-      router.push('/home');  // Redirect to home page after successful login
+      router.push('/home');  
     } else {
       setErrorMessage('Invalid member code');
     }
@@ -45,10 +44,6 @@ const LoginPage = () => {
         >
           Log in
         </button>
-
-        <p className="text-center text-gray-600 mt-4">
-          Dont have a member code? <a href="#" className="text-blue-500">Contact Support</a>
-        </p>
       </div>
     </div>
   );

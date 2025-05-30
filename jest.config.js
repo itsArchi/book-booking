@@ -1,7 +1,9 @@
-import '@testing-library/jest-dom';
+const jestDom = require('@testing-library/jest-dom');
 
 module.exports = {
-  testEnvironment: 'node',
+  testEnvironment: 'jest-environment-jsdom',
+  preset: 'next/jest',
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   transform: {
     '^.+\\.tsx?$': 'ts-jest',
   },
